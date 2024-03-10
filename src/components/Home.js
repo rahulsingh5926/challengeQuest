@@ -20,7 +20,8 @@ function Home() {
   const [endId, setEndId] = useState("");
   const startCollectionRef = collection(db, "startdate");
   const endCollectionRef = collection(db, "enddate");
-
+  const [st, setSt] = useState("");
+  const [ed, setEd] = useState("");
   const fetchStartDate = async () => {
     const data = await getDocs(startCollectionRef);
     const filteredData = data.docs.map((doc) => ({
@@ -153,32 +154,41 @@ function Home() {
         >
           Delete
         </button>
-        {
-            startDate.length!==0 && endDate.length!==0 && (
-                <div>
-          The start date of the challenge is{" "}
-          {startDate.map((item) => {
-            if (!startId) setStartId(item.id);
-            return (
-              <span style={{ color: "red" }} key={item.id}>
-                {item.startQuestDate}
-              </span>
-            );
-          })}{" "}
-          and the end date of the challenge is{" "}
-          {endDate.map((item) => {
-            if (!endId) setEndId(item.id);
-            return (
-              <span style={{ color: "red" }} key={item.id}>
-                {item.endQuestDate}
-              </span>
-            );
-          })}
-        </div>
-            )
-        }
+
         {startDate.length !== 0 && endDate.length !== 0 && (
-          <Link to="/MyCalendar">
+          <div>
+            The start date of the challenge is{" "}
+            {startDate.map((item) => {
+              if (!startId) setStartId(item.id);
+              return (
+                <span style={{ color: "red" }} key={item.id}>
+                  {item.startQuestDate}
+                </span>
+              );
+            })}{" "}
+            and the end date of the challenge is{" "}
+            {endDate.map((item) => {
+              if (!endId) setEndId(item.id);
+              return (
+                <span style={{ color: "red" }} key={item.id}>
+                  {item.endQuestDate}
+                </span>
+              );
+            })}
+          </div>
+        )}
+
+        {startDate.length !== 0 && endDate.length !== 0 && (
+          <Link
+            to={{
+              pathname: "/MyCalendar",
+              state: {
+                dateSt: startDate[0].startQuestDate,
+                dateEd: endDate[0].endQuestDate,
+              },
+            }}
+          >
+            {console.log(startDate[0].startQuestDate)}
             <button>Go to Calendar</button>
           </Link>
         )}

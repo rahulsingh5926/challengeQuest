@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import AddGoals from "./AddGoals";
 import EverdayGoal from "./EverdayGoal";
+import { useLocation } from "react-router-dom";
+
 let i = 0;
 function MyCalendar() {
+  // const location = useLocation();
+  const dateSt = "01-03-2024";
+  const dateEd = "01-05-2024";
+
   const [currMonth, setCurrMonth] = useState("");
   const [currYear, setCurrYear] = useState("");
   const [prevDates, setPrevDates] = useState([]);
@@ -256,6 +262,7 @@ function MyCalendar() {
   return (
     <>
       <h1 className="d-flex justify-content-center py-4  ">ChallengeQuest</h1>
+      {/* {`start of challenge ${dateSt} and end of challenge ${dateEd}`} */}
       <div className="d-flex ">
         <div
           class="calendar-container mx-5"
@@ -322,6 +329,50 @@ function MyCalendar() {
                 return <li class="inactive">{elem}</li>;
               })}
               {currDates.map((elem) => {
+                let day1 = parseInt(dateSt[0] + dateSt[1]);
+                let month1 = parseInt(dateSt[3] + dateSt[4]);
+                let year1 = parseInt(
+                  dateSt[6] + dateSt[7] + dateSt[8] + dateSt[9]
+                );
+                let day2 = parseInt(dateEd[0] + dateEd[1]);
+                let month2 = parseInt(dateEd[3] + dateEd[4]);
+                let year2 = parseInt(
+                  dateEd[6] + dateEd[7] + dateEd[8] + dateEd[9]
+                );
+
+                let isActive =
+                  (year === year1 &&
+                    year === year2 &&
+                    elem >= day1 &&
+                    month === month1 - 1 &&
+                    month < month2 - 1) ||
+                  (year === year1 &&
+                    year === year2 &&
+                    elem >= day1 &&
+                    elem <= day2 &&
+                    month === month1 - 1 &&
+                    month === month2 - 1) ||
+                  (year === year1 &&
+                    year === year2 &&
+                    month > month1 - 1 &&
+                    month < month2 - 1) ||
+                  (year === year1 &&
+                    year === year2 &&
+                    elem <= day2 &&
+                    month > month1 - 1 &&
+                    month === month2 - 1) ||
+                  (elem >= day1 &&
+                    month >= month1 - 1 &&
+                    year === year1 &&
+                    year < year2) ||
+                  (year > year1 && year < year2) ||
+                  (year > year1 &&
+                    year === year2 &&
+                    elem <= day2 &&
+                    month <= month2 - 1)
+                    ? "borderActive"
+                    : "";
+                console.log(year1);
                 let isToday =
                   elem === new Date().getDate() &&
                   month === new Date().getMonth() &&
@@ -332,36 +383,44 @@ function MyCalendar() {
                 const isClicked = clickedDates.includes(id);
                 return (
                   <li
-                    style={{ lineHeight: "22px" }}
+                    style={
+                      isActive ? { lineHeight: "22px" } : { lineHeight: "39px" }
+                    }
                     id={id}
-                    className={`${isToday} ${isClicked ? "click" : ""}`}
+                    className={`${isToday} ${
+                      isClicked ? "click" : ""
+                    } ${isActive}`}
                   >
                     {elem}
                     <div className="d-flex  ">
-                      <div
-                        style={{
-                          borderRadius: "50%",
-                          backgroundColor: "green",
-                          width: "15px",
-                          height: "15px",
-                          marginLeft: "50px",
-                        }}
-                        onClick={() => handleDateClick(id)}
-                      ></div>
-                      <div
-                        style={{
-                          borderRadius: "50%",
-                          backgroundColor: "orange",
-                          width: "15px",
-                          height: "15px",
-                          marginLeft: "5px",
-                        }}
-                        onClick={() => {
-                          cond === true ? setCond(false) : setCond(true);
-                        }}
-                      >
-                        {" "}
-                      </div>
+                      {isActive && (
+                        <div
+                          style={{
+                            borderRadius: "50%",
+                            backgroundColor: "green",
+                            width: "15px",
+                            height: "15px",
+                            marginLeft: "50px",
+                          }}
+                          onClick={() => handleDateClick(id)}
+                        ></div>
+                      )}
+                      {isToday && (
+                        <div
+                          style={{
+                            borderRadius: "50%",
+                            backgroundColor: "orange",
+                            width: "15px",
+                            height: "15px",
+                            marginLeft: "5px",
+                          }}
+                          onClick={() => {
+                            cond === true ? setCond(false) : setCond(true);
+                          }}
+                        >
+                          {" "}
+                        </div>
+                      )}
                     </div>
                   </li>
                 );
