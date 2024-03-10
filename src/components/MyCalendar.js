@@ -16,7 +16,7 @@ function MyCalendar() {
   // const location = useLocation();
   const dateSt = "01-03-2024";
   const dateEd = "01-05-2024";
- const a = collection(db, "accomplish");
+  const a = collection(db, "accomplish");
 
   const [currMonth, setCurrMonth] = useState("");
   const [currYear, setCurrYear] = useState("");
@@ -30,7 +30,6 @@ function MyCalendar() {
   const [index, setIndex] = useState(1);
   const [clickedDates, setClickedDates] = useState([]);
   const [cond, setCond] = useState(false);
-
 
   const months = [
     "January",
@@ -53,15 +52,6 @@ function MyCalendar() {
     setDate(currentDate1);
     setYear(currentDate1.getFullYear());
     setMonth(currentDate1.getMonth());
-
-    // setDate(new Date());
-    // setYear(date.getFullYear());
-    // setMonth(date.getMonth());
-    // const day = document.querySelector(".calendar-dates");
-
-    // const prenexIcons = document.querySelectorAll(".calendar-navigation span");
-
-    // Array of month names
 
     // Function to generate the calendar
     const manipulate = () => {
@@ -102,7 +92,6 @@ function MyCalendar() {
       newElem = [];
       // Loop to add the first dates of the next month
       for (let i = dayend; i < 6; i++) {
-        // lit += `<li class="inactive">${i - dayend + 1}</li>`;
         newElem.push(i - dayend + 1);
       }
       setNextDates(newElem);
@@ -119,9 +108,8 @@ function MyCalendar() {
     };
 
     manipulate();
-
-    
   }
+
   useEffect(() => {
     update();
   }, []);
@@ -224,30 +212,31 @@ function MyCalendar() {
   useEffect(() => {
     manipulate();
   }, [month]);
-  const handleDateClick = (id) => {
-      setClickedDates((prevClickedDates) =>
-        prevClickedDates.includes(id)
-          ? prevClickedDates.filter((data) => {
-              return data !== id;
-            })
-          : [...prevClickedDates, id]
-      );
-    };
- const clickOn = async () => {
-   const data = await getDocs(a);
-   const filteredData = data.docs.map((doc) => ({
-     ...doc.data(),
-     id: doc.id,
-   }));
-   array = filteredData;
-  //  setClickedDates(filteredData);
- };
- const setClick = async (data) => {
-   await addDoc(a, {
-     b: data,
-   });
- };
+
+  const clickOn = async () => {
+    const data = await getDocs(a);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    //  array = filteredData;
+    setClickedDates(filteredData);
+  };
+  const setClick = async (data) => {
+    await addDoc(a, {
+      b: data,
+    });
+    clickOn();
+  };
+  const deleteEvent = async (id) => {
+    const text = doc(db, "accomplish", id);
+    await deleteDoc(text);
+    clickOn();
+  };
   const [green, setGreen] = useState(false);
+  useEffect(() => {
+    clickOn();
+  }, []);
   return (
     <>
       <h1 className="d-flex justify-content-center py-4  ">ChallengeQuest</h1>
@@ -368,8 +357,18 @@ function MyCalendar() {
                   year === new Date().getFullYear()
                     ? "active"
                     : "";
+                let x;
                 const id = `${elem}_${month}_${year}`;
-                const isClicked = clickedDates.includes(id);
+                const isClicked = clickedDates.some((item) => item.b === id);
+                if (isClicked) {
+                  for (let i = 0; i < clickedDates.length; i++) {
+                    if (clickedDates[i].b === id) {
+                      x = clickedDates[i].id;
+                      console.log(x);
+                      break;
+                    }
+                  }
+                }
                 return (
                   <li
                     style={
@@ -377,7 +376,7 @@ function MyCalendar() {
                     }
                     id={id}
                     className={`${isToday} ${
-                      isClicked ? "click" : ""
+                      isClicked === true ? "click" : ""
                     } ${isActive}`}
                   >
                     {elem}
@@ -391,7 +390,9 @@ function MyCalendar() {
                             height: "15px",
                             marginLeft: "50px",
                           }}
-                          onClick={() => handleDateClick(id)}
+                          onClick={() => {
+                            isClicked === false ? setClick(id) : deleteEvent(x);
+                          }}
                         ></div>
                       )}
                       {isToday && (
