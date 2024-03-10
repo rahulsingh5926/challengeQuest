@@ -2,12 +2,21 @@ import React, { useState, useEffect } from "react";
 import AddGoals from "./AddGoals";
 import EverdayGoal from "./EverdayGoal";
 import { useLocation } from "react-router-dom";
-
+import { db } from "./firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+let array;
 let i = 0;
 function MyCalendar() {
   // const location = useLocation();
   const dateSt = "01-03-2024";
   const dateEd = "01-05-2024";
+ const a = collection(db, "accomplish");
 
   const [currMonth, setCurrMonth] = useState("");
   const [currYear, setCurrYear] = useState("");
@@ -22,15 +31,7 @@ function MyCalendar() {
   const [clickedDates, setClickedDates] = useState([]);
   const [cond, setCond] = useState(false);
 
-  const handleDateClick = (id) => {
-    setClickedDates((prevClickedDates) =>
-      prevClickedDates.includes(id)
-        ? prevClickedDates.filter((data) => {
-            return data !== id;
-          })
-        : [...prevClickedDates, id]
-    );
-  };
+
   const months = [
     "January",
     "February",
@@ -119,46 +120,12 @@ function MyCalendar() {
 
     manipulate();
 
-    // Attach a click event listener to each icon
-    // prenexIcons.forEach((icon) => {
-    //   // When an icon is clicked
-    //   icon.addEventListener("click", () => {
-    //     // Check if the icon is "calendar-prev"
-    //     // or "calendar-next"
-    //     month = icon.id === "calendar-prev" ? month - 1 : month + 1;
-
-    //     // Check if the month is out of range
-    //     if (month < 0 || month > 11) {
-    //       // Set the date to the first day of the
-    //       // month with the new year
-    //       date = new Date(year, month, new Date().getDate());
-
-    //       // Set the year to the new year
-    //       year = date.getFullYear();
-
-    //       // Set the month to the new month
-    //       month = date.getMonth();
-    //     } else {
-    //       // Set the date to the current date
-    //       date = new Date();
-    //     }
-
-    //     // Call the manipulate function to
-    //     // update the calendar display
-    //     manipulate();
-    //   });
-    // });
+    
   }
   useEffect(() => {
     update();
   }, []);
-  // function handleClick(id) {
-  //   const element = document.getElementById(id);
-  //   console.log(id);
 
-  //   if (element.classList.contains("click")) element.classList.remove("click");
-  //   else element.classList.add("click");
-  // }
   const manipulate = () => {
     // Get the first day of the month
     let x = new Date(year, month, 1);
@@ -257,7 +224,29 @@ function MyCalendar() {
   useEffect(() => {
     manipulate();
   }, [month]);
-
+  const handleDateClick = (id) => {
+      setClickedDates((prevClickedDates) =>
+        prevClickedDates.includes(id)
+          ? prevClickedDates.filter((data) => {
+              return data !== id;
+            })
+          : [...prevClickedDates, id]
+      );
+    };
+ const clickOn = async () => {
+   const data = await getDocs(a);
+   const filteredData = data.docs.map((doc) => ({
+     ...doc.data(),
+     id: doc.id,
+   }));
+   array = filteredData;
+  //  setClickedDates(filteredData);
+ };
+ const setClick = async (data) => {
+   await addDoc(a, {
+     b: data,
+   });
+ };
   const [green, setGreen] = useState(false);
   return (
     <>
